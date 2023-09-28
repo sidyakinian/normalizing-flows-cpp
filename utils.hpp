@@ -4,7 +4,8 @@
 
 class Utils {
     public:
-        static void print_vector(std::vector<float> vector) {
+        template<typename T>
+        static void print_vector(const std::vector<T> &vector) {
             std::cout << "[";
             for (int i = 0; i < vector.size(); i++) {
                 std::cout << vector[i];
