@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -std=c++11
+CXXFLAGS = -Wall -g -std=c++20
 BUILD_DIR = build
 
 TARGET = program
