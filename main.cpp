@@ -3,12 +3,12 @@
 #include <vector>
 
 #include "elementwise_multiplier.hpp"
+#include "utils.hpp"
 
 using std::vector;
 
 int main(int argc, char** argv) {
 
-    // Create random input matrix (flattened to 1d)
     int size = 10;
     vector<float> input_matrix;
     input_matrix.resize(size * size);
@@ -18,6 +18,8 @@ int main(int argc, char** argv) {
 
     ElementwiseMultiplier element_wise_multiplier = ElementwiseMultiplier(size);
     vector<float> output_matrix = element_wise_multiplier.multiply(input_matrix);
+
+    Utils::print_vector(output_matrix);
 
     return 0;
 }
