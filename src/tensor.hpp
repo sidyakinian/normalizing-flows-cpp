@@ -43,7 +43,7 @@ public:
         infile.close();
     }
 
-    void setShape(const vector<int>& shape) {
+    void reshape(const vector<int>& newShape) {
         shape_ = shape;
     }
 
