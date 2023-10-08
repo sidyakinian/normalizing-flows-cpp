@@ -43,4 +43,8 @@ public:
 
         return result;
     }
+
+    static Tensor searchSorted(const Tensor bin_locations, const Tensor inputs, float eps=0.000001) {
+        return Tensor();
+    }
 };

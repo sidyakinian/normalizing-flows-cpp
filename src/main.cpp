@@ -17,5 +17,8 @@ int main(int argc, char** argv) {
     Tensor sum_tensor = Ops::sum(tensor, 0);
     Utils::print_tensor(sum_tensor);
 
+    Tensor sum_tensor2 = sum_tensor + 100;
+    Utils::print_tensor(sum_tensor2);
+
     return 0;
 }

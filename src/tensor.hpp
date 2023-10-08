@@ -142,7 +142,36 @@ public:
         return shape_;
     }
 
+    Tensor operator+(const Tensor &other) const {
+        if (shape_ != other.getShape()) {
+            std::cerr << "Shape mismatch for tensor addition" << std::endl;
+            return Tensor();
+        }
+
+        Tensor result(shape_);
+        for (size_t i = 0; i < data_.size(); ++i) {
+            result.data()[i] = data_[i] + other.getData()[i];
+        }
+
+        return result;
+    }
+
+    Tensor operator+(float scalar) const {
+        Tensor result(shape_);
+        for (size_t i = 0; i < data_.size(); ++i) {
+            result.data()[i] = data_[i] + scalar;
+        }
+
+        return result;
+    }
+
+    friend Tensor operator+(float scalar, const Tensor &tensor);
+
 private:
     vector<float> data_;
     vector<int> shape_;
 };
+
+inline Tensor operator+(float scalar, const Tensor &tensor) {
+    return tensor + scalar;
+}
