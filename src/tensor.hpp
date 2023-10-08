@@ -43,8 +43,8 @@ public:
         infile.close();
     }
 
-    void reshape(const vector<int>& newShape) {
-        shape_ = shape;
+    void reshape(const vector<int>& new_shape) {
+        shape_ = new_shape;
     }
 
     vector<float> getData() const {
