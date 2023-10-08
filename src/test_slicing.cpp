@@ -53,6 +53,7 @@ int main() {
     test_sliceLast_slicing_left_bound_only();
     test_sliceLast_slicing_right_bound_only();
     
+    // TODO: differentiate between tests passing and failing, probably with exceptions functionality
     std::cout << "Tests completed" << std::endl;
     return 0;
 }
