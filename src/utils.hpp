@@ -8,10 +8,6 @@
 
 class Utils {
     public:
-        static void print_unicorn() {
-            std::cout << "🦄" << std::endl;
-        }
-
         static void print_tensor(const Tensor &tensor) {
             vector<int> shape = tensor.getShape();
             if (shape.empty()) {
