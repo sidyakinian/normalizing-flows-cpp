@@ -47,6 +47,26 @@ public:
         shape_ = new_shape;
     }
 
+    float min() const {
+        float min = data_[0];
+        for (float value : data_) {
+            if (value < min) {
+                min = value;
+            }
+        }
+        return min;
+    }
+
+    float max() const {
+        float max = data_[0];
+        for (float value : data_) {
+            if (value > max) {
+                max = value;
+            }
+        }
+        return max;
+    }
+
     vector<float> getData() const {
         return data_;
     }
