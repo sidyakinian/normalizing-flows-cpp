@@ -69,6 +69,10 @@ public:
     }
 
     Tensor sliceLast(int index) {
+        if (index == -1) {
+            index = shape_.back() - 1;
+        }
+
         if (index < 0 || index >= shape_.back()) {
             std::cerr << "Index out of bounds" << std::endl;
             return Tensor();
@@ -94,6 +98,13 @@ public:
         int start = start_opt.value_or(0);
         int end = end_opt.value_or(shape_.back());
 
+        if (start == -1) {
+            start = shape_.back() - 1;
+        }
+        if (end == -1) {
+            end = shape_.back();
+        }
+
         if (start < 0) start = 0;
         if (end > shape_.back()) end = shape_.back();
 
@@ -118,7 +129,6 @@ public:
 
         return result;
     }
-
 
     vector<float> getData() const {
         return data_;

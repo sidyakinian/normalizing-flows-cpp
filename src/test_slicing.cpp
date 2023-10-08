@@ -14,6 +14,17 @@ void test_sliceLast_indexing() {
     }
 }
 
+void test_sliceLast_indexing_last_dim() {
+    Tensor tensor({3, 4, 5});
+    tensor.load("../test_tensor.txt");
+    Tensor result = tensor.sliceLast(-1);
+    
+    vector<int> expected_shape = {3, 4};
+    if (result.getShape() != expected_shape) {
+        std::cerr << "Error in test_sliceLast_indexing: Unexpected shape" << std::endl;
+    }
+}
+
 void test_sliceLast_slicing_full() {
     Tensor tensor({3, 4, 5});
     tensor.load("../test_tensor.txt");
@@ -42,6 +53,17 @@ void test_sliceLast_slicing_right_bound_only() {
     Tensor result = tensor.sliceLast(std::nullopt, 3);
 
     vector<int> expected_shape = {3, 4, 3};
+    if (result.getShape() != expected_shape) {
+        std::cerr << "Error in test_sliceLast_slicing_right_bound_only: Unexpected shape" << std::endl;
+    }
+}
+
+void test_sliceLast_slicing_right_bound_only_last_dim() {
+    Tensor tensor({3, 4, 5});
+    tensor.load("../test_tensor.txt");
+    Tensor result = tensor.sliceLast(std::nullopt, -1);
+
+    vector<int> expected_shape = {3, 4, 4};
     if (result.getShape() != expected_shape) {
         std::cerr << "Error in test_sliceLast_slicing_right_bound_only: Unexpected shape" << std::endl;
     }
