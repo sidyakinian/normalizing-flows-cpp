@@ -5,6 +5,7 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <optional>
 
 using std::vector;
 using std::string;
@@ -66,6 +67,58 @@ public:
         }
         return max;
     }
+
+    Tensor sliceLast(int index) {
+        if (index < 0 || index >= shape_.back()) {
+            std::cerr << "Index out of bounds" << std::endl;
+            return Tensor();
+        }
+
+        vector<int> new_shape(shape_.begin(), shape_.end() - 1);
+        Tensor result(new_shape);
+
+        int stride = 1;
+        for (size_t i = 0; i < shape_.size() - 1; ++i) {
+            stride *= shape_[i];
+        }
+
+        int start_index = index * stride;
+        int end_index = start_index + stride;
+
+        std::copy(data_.begin() + start_index, data_.begin() + end_index, result.getData().begin());
+
+        return result;
+    }
+
+    Tensor sliceLast(std::optional<int> start_opt = std::nullopt, std::optional<int> end_opt = std::nullopt) {
+        int start = start_opt.value_or(0);
+        int end = end_opt.value_or(shape_.back());
+
+        if (start < 0) start = 0;
+        if (end > shape_.back()) end = shape_.back();
+
+        if (start > end) {
+            std::cerr << "Invalid slice range" << std::endl;
+            return Tensor();
+        }
+
+        vector<int> new_shape(shape_);
+        new_shape.back() = end - start;
+        Tensor result(new_shape);
+
+        int stride = 1;
+        for (size_t i = 0; i < shape_.size() - 1; ++i) {
+            stride *= shape_[i];
+        }
+
+        int start_index = start * stride;
+        int end_index = end * stride;
+
+        std::copy(data_.begin() + start_index, data_.begin() + end_index, result.getData().begin());
+
+        return result;
+    }
+
 
     vector<float> getData() const {
         return data_;

@@ -9,7 +9,7 @@
 using std::vector;
 
 int main(int argc, char** argv) {
-    Tensor tensor({3, 3});
+    Tensor tensor({5, 3, 4});
     tensor.load("test_tensor.txt");
     Utils::print_tensor(tensor);
 
