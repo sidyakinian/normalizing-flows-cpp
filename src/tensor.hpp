@@ -89,7 +89,7 @@ public:
         int start_index = index * stride;
         int end_index = start_index + stride;
 
-        std::copy(data_.begin() + start_index, data_.begin() + end_index, result.getData().begin());
+        std::copy(data_.begin() + start_index, data_.begin() + end_index, result.data().begin());
 
         return result;
     }
@@ -125,12 +125,16 @@ public:
         int start_index = start * stride;
         int end_index = end * stride;
 
-        std::copy(data_.begin() + start_index, data_.begin() + end_index, result.getData().begin());
+        std::copy(data_.begin() + start_index, data_.begin() + end_index, result.data().begin());
 
         return result;
     }
 
     vector<float> getData() const {
+        return data_;
+    }
+
+    vector<float>& data() {
         return data_;
     }
 
