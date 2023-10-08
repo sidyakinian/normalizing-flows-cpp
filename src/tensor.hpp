@@ -6,6 +6,9 @@
 #include <vector>
 #include <string>
 #include <optional>
+#include <cstdlib>
+#include <ctime>
+#include <random>
 
 using std::vector;
 using std::string;
@@ -13,12 +16,21 @@ using std::string;
 class Tensor {
 public:
     Tensor() {}
-    Tensor(const vector<int>& shape) : shape_(shape) {
+    Tensor(const vector<int>& shape, bool random_init = false) : shape_(shape) {
         int total_size = 1;
         for (int dim_size : shape) {
             total_size *= dim_size;
         }
         data_.resize(total_size, 0.0);
+        
+        if (random_init) {
+            unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+            std::mt19937 generator(seed);
+            std::uniform_real_distribution<float> distribution(0.0, 1.0);
+            for (auto& val : data_) {
+                val = distribution(generator);
+            }
+        }
     }
     ~Tensor() {}
 
@@ -165,6 +177,38 @@ public:
         return result;
     }
 
+    Tensor operator>=(const Tensor &other) const {
+        if (shape_ == other.getShape()) {
+            Tensor result(shape_);
+            for (size_t i = 0; i < data_.size(); ++i) {
+                result.data()[i] = (data_[i] >= other.getData()[i]) ? 1.0f : 0.0f;
+            }
+            return result;
+        } else if (other.getShape().back() == 1 && shape_.size() == other.getShape().size()) {
+            Tensor result(shape_);
+            int stride = 1;
+            for (size_t i = 0; i < shape_.size() - 1; ++i) {
+                stride *= shape_[i];
+            }
+            for (size_t i = 0; i < data_.size(); ++i) {
+                result.data()[i] = (data_[i] >= other.getData()[i/stride]) ? 1.0f : 0.0f;
+            }
+            return result;
+        } else {
+            std::cerr << "Shape mismatch for comparison" << std::endl;
+            return Tensor(); 
+        }
+    }
+
+    Tensor operator>=(float scalar) const {
+        Tensor result(shape_);
+        for (size_t i = 0; i < data_.size(); ++i) {
+            result.data()[i] = (data_[i] >= scalar) ? 1.0f : 0.0f;
+        }
+        return result;
+    }
+
+    friend Tensor operator>=(float scalar, const Tensor &tensor);
     friend Tensor operator+(float scalar, const Tensor &tensor);
 
 private:
@@ -174,4 +218,13 @@ private:
 
 inline Tensor operator+(float scalar, const Tensor &tensor) {
     return tensor + scalar;
+}
+
+inline Tensor operator>=(float scalar, const Tensor &tensor) {
+    Tensor result(tensor.getShape());
+    const vector<float>& tensorData = tensor.getData();
+    for (size_t i = 0; i < tensorData.size(); ++i) {
+        result.data()[i] = (scalar >= tensorData[i]) ? 1.0f : 0.0f;
+    }
+    return result;
 }
