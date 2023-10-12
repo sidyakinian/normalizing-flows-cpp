@@ -142,6 +142,25 @@ public:
         return result;
     }
 
+    Tensor cumsum() {
+        int last_dim_size = shape_.back();
+        int num_slices = data_.size() / last_dim_size;
+
+        Tensor result = Tensor(shape_);
+
+        for (int slice = 0; slice < num_slices; ++slice) {
+            float running_total = 0.0;
+            for (int idx = 0; idx < last_dim_size; ++idx) {
+                int data_idx = slice * last_dim_size + idx;
+                running_total += result.getData()[data_idx];
+                result.data()[data_idx] = running_total;
+            }
+        }
+
+        return result;
+    }
+
+
     vector<float> getData() const {
         return data_;
     }
