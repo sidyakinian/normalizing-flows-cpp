@@ -39,13 +39,17 @@ tuple<Tensor, Tensor> rqt(
     Tensor widths = unnormalized_widths.softmax_last_dim();
     widths = min_bin_width + (1.0 - min_bin_width * num_bins) * widths;
     Tensor cumwidths = widths.cumsum();
-
-    Utils::printTensor(widths, "widths");
-    Utils::printTensor(cumwidths, "cumwidths");
+    cumwidths = cumwidths.pad(true, false);
+    cumwidths = cumwidths + left;
 
     Tensor heights = unnormalized_heights.softmax_last_dim();
     heights = min_bin_height + (1.0 - min_bin_height * num_bins) * heights;
     Tensor cumheights = heights.cumsum();
+    cumheights = cumheights.pad(true, false);
+    cumheights = cumheights + bottom;
+
+    Utils::printTensor(cumwidths, "cumwidths");
+    Utils::printTensor(cumheights, "cumheights");
 
     Tensor tensor_1 = Tensor({4, 5}, true);
     Tensor tensor_2 = Tensor({4, 5}, true);

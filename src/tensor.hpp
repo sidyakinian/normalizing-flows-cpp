@@ -180,6 +180,38 @@ public:
         return result;
     }
 
+    Tensor pad(bool pad_left, bool pad_right) const {
+        int dims = shape_.size();
+        if (dims < 2 || dims > 4) {
+            std::cerr << "The function supports tensors from 2D to 4D." << std::endl;
+            return Tensor();
+        }
+
+        std::vector<int> new_shape = shape_;
+        new_shape.back() += (pad_left ? 1 : 0) + (pad_right ? 1 : 0);  // update the last dimension
+
+        Tensor result(new_shape);
+        
+        int n = (dims > 3) ? shape_[0] : 1;
+        int c = (dims > 2) ? shape_[dims - 3] : 1;
+        int h = shape_[dims - 2];
+        int w = shape_[dims - 1];
+
+        for (int ni = 0; ni < n; ++ni) {
+            for (int ci = 0; ci < c; ++ci) {
+                for (int hi = 0; hi < h; ++hi) {
+                    for (int wi = 0; wi < w; ++wi) {
+                        int old_idx = (ni * c * h * w) + (ci * h * w) + (hi * w) + wi;
+                        int new_idx = (ni * c * h * new_shape.back()) + (ci * h * new_shape.back()) + (hi * new_shape.back()) + wi + (pad_left ? 1 : 0);
+                        result.data_[new_idx] = data_[old_idx];
+                    }
+                }
+            }
+        }
+        
+        return result;
+    }
+    
     Tensor gather(const Tensor& bin_idx) const {
         if (shape_.size() != bin_idx.shape_.size()) {
             std::cerr << "Shape mismatch!" << std::endl;
