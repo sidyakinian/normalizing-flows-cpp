@@ -8,11 +8,13 @@
 
 class Utils {
     public:
-        static void print_tensor(const Tensor &tensor) {
+        static void printTensor(const Tensor &tensor, std::string name) {
             vector<int> shape = tensor.getShape();
             if (shape.empty()) {
                 return;
             }
+
+            std::cout << "tensor " << name << std::endl;
 
             if (shape.size() == 1) {
                 for (int i = 0; i < shape[0]; ++i) {

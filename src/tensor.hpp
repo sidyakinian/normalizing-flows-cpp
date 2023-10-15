@@ -16,7 +16,7 @@ using std::string;
 class Tensor {
 public:
     Tensor() {}
-    Tensor(const vector<int>& shape, bool random_init = false) : shape_(shape) {
+    Tensor(const std::vector<int>& shape, bool random_init = false) : shape_(shape) {
         int total_size = 1;
         for (int dim_size : shape) {
             total_size *= dim_size;
@@ -26,7 +26,7 @@ public:
         if (random_init) {
             unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
             std::mt19937 generator(seed);
-            std::uniform_real_distribution<float> distribution(0.0, 1.0);
+            std::normal_distribution<float> distribution(0.0, 1.0);  // Mean = 0, Standard deviation = 1
             for (auto& val : data_) {
                 val = distribution(generator);
             }
@@ -46,7 +46,7 @@ public:
             string value;
             int index = 0;
             while (std::getline(iss, value, ',')) {
-                // Remove leading and trailing whitespaces
+                // remove leading and trailing whitespaces
                 value.erase(0, value.find_first_not_of(" \t\n\r"));
                 value.erase(value.find_last_not_of(" \t\n\r") + 1);
                 data_.at(index) = std::stof(value);
@@ -154,6 +154,64 @@ public:
                 int data_idx = slice * last_dim_size + idx;
                 running_total += getData()[data_idx];
                 result.data()[data_idx] = running_total;
+            }
+        }
+
+        return result;
+    }
+
+    Tensor softmax_last_dim() const {
+        Tensor result(shape_);
+
+        int last_dim_size = shape_.back();
+        int num_groups = data_.size() / last_dim_size;
+
+        for (int i = 0; i < num_groups; i++) {
+            float sum_exp = 0.0;
+            for (int j = 0; j < last_dim_size; j++) {
+                sum_exp += std::exp(data_[i * last_dim_size + j]);
+            }
+
+            for (int j = 0; j < last_dim_size; j++) {
+                result.data_[i * last_dim_size + j] = std::exp(data_[i * last_dim_size + j]) / sum_exp;
+            }
+        }
+
+        return result;
+    }
+
+    Tensor gather(const Tensor& bin_idx) const {
+        if (shape_.size() != bin_idx.shape_.size()) {
+            std::cerr << "Shape mismatch!" << std::endl;
+            return Tensor();
+        }
+
+        for (size_t i = 0; i < shape_.size() - 1; i++) {
+            if (shape_[i] != bin_idx.shape_[i]) {
+                std::cerr << "Shape mismatch!" << std::endl;
+                return Tensor();
+            }
+        }
+
+        if (shape_.back() < bin_idx.shape_.back()) {
+            std::cerr << "Index tensor larger than the data tensor in the last dimension!" << std::endl;
+            return Tensor();
+        }
+
+        Tensor result(bin_idx.shape_);
+
+        int last_dim_size = shape_.back();
+        int bin_idx_last_dim_size = bin_idx.shape_.back();
+        int num_slices = data_.size() / last_dim_size;
+
+        for (int slice = 0; slice < num_slices; ++slice) {
+            for (int idx = 0; idx < bin_idx_last_dim_size; ++idx) {
+                int gather_idx = static_cast<int>(bin_idx.data_[slice * bin_idx_last_dim_size + idx]);
+                if (gather_idx < 0 || gather_idx >= last_dim_size) {
+                    std::cerr << "Invalid index in bin_idx tensor!" << std::endl;
+                    return Tensor();
+                }
+                result.data_[slice * bin_idx_last_dim_size + idx] = data_[slice * last_dim_size + gather_idx];
             }
         }
 

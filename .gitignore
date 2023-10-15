@@ -1,6 +1,7 @@
 .vscode/
 build/
 venv/
+tensor_files/
 
 # executable
 program

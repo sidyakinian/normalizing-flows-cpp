@@ -1,13 +1,14 @@
 import numpy as np
 import torch
 from torch.nn import functional as F
+from pdb import set_trace as bkpt
+from typing import List
 
 ### Define RQT (rational quadratic transform)
 
 DEFAULT_MIN_BIN_WIDTH = 1e-3
 DEFAULT_MIN_BIN_HEIGHT = 1e-3
 DEFAULT_MIN_DERIVATIVE = 1e-3
-
 
 def piecewise_rational_quadratic_transform(inputs, 
                                            unnormalized_widths,
@@ -19,7 +20,6 @@ def piecewise_rational_quadratic_transform(inputs,
                                            min_bin_width=DEFAULT_MIN_BIN_WIDTH,
                                            min_bin_height=DEFAULT_MIN_BIN_HEIGHT,
                                            min_derivative=DEFAULT_MIN_DERIVATIVE):
-
     if tails is None:
         spline_fn = rational_quadratic_spline
         spline_kwargs = {}
@@ -45,6 +45,7 @@ def piecewise_rational_quadratic_transform(inputs,
 
 
 def searchsorted(bin_locations, inputs, eps=1e-6):
+    bkpt()
     bin_locations[..., -1] += eps
     return torch.sum(
         inputs[..., None] >= bin_locations,
@@ -62,7 +63,6 @@ def unconstrained_rational_quadratic_spline(inputs,
                                             min_bin_width=DEFAULT_MIN_BIN_WIDTH,
                                             min_bin_height=DEFAULT_MIN_BIN_HEIGHT,
                                             min_derivative=DEFAULT_MIN_DERIVATIVE):
-    # from pdb import set_trace as bkpt; bkpt()
     inside_interval_mask = (inputs >= -tail_bound) & (inputs <= tail_bound)
     outside_interval_mask = ~inside_interval_mask
 
@@ -70,6 +70,7 @@ def unconstrained_rational_quadratic_spline(inputs,
     logabsdet = torch.zeros_like(inputs)
 
     if tails == 'linear':
+        bkpt()
         unnormalized_derivatives = F.pad(unnormalized_derivatives, pad=(1, 1))
         constant = np.log(np.exp(1 - min_derivative) - 1)
         unnormalized_derivatives[..., 0] = constant
@@ -103,8 +104,6 @@ def rational_quadratic_spline(inputs,
                               min_bin_width=DEFAULT_MIN_BIN_WIDTH,
                               min_bin_height=DEFAULT_MIN_BIN_HEIGHT,
                               min_derivative=DEFAULT_MIN_DERIVATIVE):
-    # from pdb import set_trace as bkpt; bkpt()
-
     if torch.min(inputs) < left or torch.max(inputs) > right:
         raise ValueError('Input to a transform is not within its domain')
 
@@ -118,6 +117,7 @@ def rational_quadratic_spline(inputs,
     widths = F.softmax(unnormalized_widths, dim=-1)
     widths = min_bin_width + (1 - min_bin_width * num_bins) * widths
     cumwidths = torch.cumsum(widths, dim=-1)
+    bkpt()
     cumwidths = F.pad(cumwidths, pad=(1, 0), mode='constant', value=0.0)
     cumwidths = (right - left) * cumwidths + left
     cumwidths[..., 0] = left
@@ -130,6 +130,7 @@ def rational_quadratic_spline(inputs,
     heights = F.softmax(unnormalized_heights, dim=-1)
     heights = min_bin_height + (1 - min_bin_height * num_bins) * heights
     cumheights = torch.cumsum(heights, dim=-1)
+    bkpt()
     cumheights = F.pad(cumheights, pad=(1, 0), mode='constant', value=0.0)
     cumheights = (top - bottom) * cumheights + bottom
     cumheights[..., 0] = bottom
@@ -181,10 +182,21 @@ def rational_quadratic_spline(inputs,
 
 ### Infer
 
-x1_in = torch.randn(1, 1, 55)
-unnormalized_widths = torch.randn(1, 1, 55, 10)
-unnormalized_heights = torch.randn(1, 1, 55, 10)
-unnormalized_derivatives = torch.randn(1, 1, 55, 9)
+def load_tensor_from_file(shape: List[int], file_path: str) -> torch.Tensor:
+    with open(file_path, 'r') as file:
+        tensor_str = file.read()
+        tensor_list = tensor_str.split(', ')
+        tensor_list = [float(val) for val in tensor_list]
+        tensor = torch.tensor(tensor_list)
+        tensor = tensor.reshape(*shape)
+        return tensor
+
+x1_in = load_tensor_from_file([1, 1, 55], "tensor_files/x1_in.txt")
+unnormalized_widths = load_tensor_from_file([1, 1, 55, 10], "tensor_files/unnormalized_widths.txt")
+unnormalized_heights = load_tensor_from_file([1, 1, 55, 10], "tensor_files/unnormalized_heights.txt")
+unnormalized_derivatives = load_tensor_from_file([1, 1, 55, 9], "tensor_files/unnormalized_derivatives.txt")
+
+bkpt()
 
 x1_out, logabsdet = piecewise_rational_quadratic_transform(
     x1_in,
