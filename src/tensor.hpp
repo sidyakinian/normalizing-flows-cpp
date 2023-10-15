@@ -152,15 +152,14 @@ public:
             float running_total = 0.0;
             for (int idx = 0; idx < last_dim_size; ++idx) {
                 int data_idx = slice * last_dim_size + idx;
-                running_total += result.getData()[data_idx];
+                running_total += getData()[data_idx];
                 result.data()[data_idx] = running_total;
             }
         }
 
         return result;
     }
-
-
+    
     vector<float> getData() const {
         return data_;
     }
@@ -191,6 +190,29 @@ public:
         Tensor result(shape_);
         for (size_t i = 0; i < data_.size(); ++i) {
             result.data()[i] = data_[i] + scalar;
+        }
+
+        return result;
+    }
+
+    Tensor operator*(const Tensor &other) const {
+        if (shape_ != other.getShape()) {
+            std::cerr << "Shape mismatch for tensor addition" << std::endl;
+            return Tensor();
+        }
+
+        Tensor result(shape_);
+        for (size_t i = 0; i < data_.size(); ++i) {
+            result.data()[i] = data_[i] * other.getData()[i];
+        }
+
+        return result;
+    }
+
+    Tensor operator*(float scalar) const {
+        Tensor result(shape_);
+        for (size_t i = 0; i < data_.size(); ++i) {
+            result.data()[i] = data_[i] * scalar;
         }
 
         return result;
@@ -229,6 +251,7 @@ public:
 
     friend Tensor operator>=(float scalar, const Tensor &tensor);
     friend Tensor operator+(float scalar, const Tensor &tensor);
+    friend Tensor operator*(float scalar, const Tensor &tensor);
 
 private:
     vector<float> data_;
@@ -237,6 +260,10 @@ private:
 
 inline Tensor operator+(float scalar, const Tensor &tensor) {
     return tensor + scalar;
+}
+
+inline Tensor operator*(float scalar, const Tensor &tensor) {
+    return tensor * scalar;
 }
 
 inline Tensor operator>=(float scalar, const Tensor &tensor) {
