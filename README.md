@@ -1,4 +1,4 @@
-<img width="1000" alt="flows" src="https://github.com/sidyakinian/normalizing-flows-cpp/assets/34050187/23a1446a-794b-48af-9e7b-c6fb513e9443">
+<img width="1000" alt="flows" src="https://github.com/sidyakinian/normalizing-flows-cpp/assets/34050187/a7b48ac8-4760-4e02-916c-de6fbd1b2dcf">
 
 # Normalizing flows in C++
 
