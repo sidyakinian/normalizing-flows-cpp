@@ -41,6 +41,6 @@ Below is the list of all tensor operations that are going to be implemented. Som
 - [ ] `softplus`
 - [x] `permute` (special case only)
 - [ ] `search_sorted` (composite operation)
-- [ ] Elementwise addition.
-- [ ] Elementwise multiplication.
-- [ ] Elemenwise subtraction.
+- [x] Elementwise addition.
+- [x] Elementwise multiplication.
+- [x] Elemenwise subtraction.
