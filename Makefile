@@ -4,10 +4,11 @@ BUILD_DIR = build
 
 TARGET = program
 
-SRCS = $(wildcard *.cpp)
-OBJS = $(addprefix $(BUILD_DIR)/, $(SRCS:.cpp=.o))
+SRCS = $(wildcard src/*.cpp)
 
-$(BUILD_DIR)/%.o: %.cpp $(wildcard *.h)
+OBJS = $(addprefix $(BUILD_DIR)/, $(notdir $(SRCS:.cpp=.o)))
+
+$(BUILD_DIR)/%.o: src/%.cpp $(wildcard src/*.h)
 	@mkdir -p $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
