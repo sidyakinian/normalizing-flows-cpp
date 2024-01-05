@@ -33,7 +33,7 @@ Below is the list of all tensor operations that are going to be implemented. Som
 
 - [x] `min`/`max`
 - [x] `gather`
-- [x] `reshape'
+- [x] `reshape`
 - [x] `softmax` (last dimension only)
 - [x] `slice` (last dimension only)
 - [x] `pad` (special case only)
